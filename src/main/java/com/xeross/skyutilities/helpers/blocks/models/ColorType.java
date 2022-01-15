@@ -2,6 +2,7 @@ package com.xeross.skyutilities.helpers.blocks.models;
 
 import org.bukkit.DyeColor;
 
+@SuppressWarnings("unused")
 public enum ColorType {
     WHITE(0, 15, DyeColor.WHITE),
     ORANGE(1, 14, DyeColor.ORANGE),
@@ -19,28 +20,28 @@ public enum ColorType {
     GREEN(13, 2, DyeColor.GREEN),
     RED(14, 1, DyeColor.RED),
     BLACK(15, 0, DyeColor.BLACK);
-
+    
     private final byte dataWool;
     private final byte dataGlassAndDye;
     private final DyeColor dyeColor;
-
+    
     public byte getWoolData() {
         return dataWool;
     }
-
+    
     public byte getGlassAndDyeData() {
         return dataGlassAndDye;
     }
-
+    
     public DyeColor getDyeColor() {
         return dyeColor;
     }
-
+    
     ColorType(final int dataWool, final int dataGlassAndDye, final DyeColor dyeColor) {
         this.dataWool = ((byte) dataWool);
         this.dataGlassAndDye = ((byte) dataGlassAndDye);
         this.dyeColor = dyeColor;
     }
-
-
+    
+    
 }

@@ -5,7 +5,7 @@ import com.xeross.skyutilities.helpers.items.utils.ItemCreator;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-@SuppressWarnings("deprecation")
+@SuppressWarnings({"deprecation", "unused"})
 public enum Skull {
     
     OAK_RIGHT(new ItemCreator(Material.INK_SACK).setDurability((short) ColorType.LIME.getDyeColor().getDyeData()).getItem(),

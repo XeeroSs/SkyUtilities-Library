@@ -4,21 +4,17 @@ import com.xeross.skyutilities.core.APIHandler;
 import com.xeross.skyutilities.core.RegisterHandler;
 import org.bukkit.plugin.Plugin;
 
-public class SkyUtilities {
+public class SkyUtilities<P extends Plugin> {
     
-    private APIHandler apiHandler;
+    private final APIHandler<P> apiHandler;
     
-    public SkyUtilities(final Plugin plugin, boolean antiSpamMenu) {
-        this.apiHandler = new APIHandler(this);
+    public SkyUtilities(final P plugin, boolean antiSpamMenu) {
+        this.apiHandler = new APIHandler<>(plugin);
         this.apiHandler.build();
         if (antiSpamMenu) new RegisterHandler(plugin);
     }
     
-    public void setApiHandler(APIHandler apiHandler) {
-        this.apiHandler = apiHandler;
-    }
-    
-    public APIHandler getAPI() {
+    public APIHandler<P> getAPI() {
         return apiHandler;
     }
 }

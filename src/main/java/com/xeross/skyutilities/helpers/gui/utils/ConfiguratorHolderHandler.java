@@ -15,17 +15,17 @@ import com.xeross.skyutilities.helpers.items.models.Skull;
 import com.xeross.skyutilities.helpers.items.utils.ItemCreator;
 import com.xeross.skyutilities.helpers.messages.LangLinesWithTitleHandler;
 import com.xeross.skyutilities.helpers.messages.LangMessageHandler;
-import com.xeross.skyutilities.helpers.messages.api.Lang;
 import com.xeross.skyutilities.helpers.messages.api.MessageType;
 import com.xeross.skyutilities.helpers.messages.models.MessagesHolder;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftInventoryPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.Plugin;
 
 import java.util.*;
 
@@ -47,15 +47,16 @@ import java.util.*;
  * @author XeroSs
  * @version 1.7.0
  */
-public abstract class ConfiguratorHolderHandler<O extends Enum<O> & MessageType, L extends Enum<L> & MessageType> extends GUI {
+@SuppressWarnings({"unused", "CommentedOutCode"})
+public abstract class ConfiguratorHolderHandler<P extends Plugin, O extends Enum<O> & MessageType, L extends Enum<L> & MessageType> extends GUI<P> {
     
     private final Map<String, ConfiguratorHolderData> cache;
-    private final LinkedHashMap<Integer, ConfiguratorHolderItem<O>> items;
-    private final ArrayList<ConfiguratorHolder<O>> fromItems;
-    private final HashMap<Integer, ConfiguratorHolder<O>> fromItemsWithPosition;
-    private final HashMap<Integer, HolderItem<O>> itemOnly;
+    private final LinkedHashMap<Integer, ConfiguratorHolderItem<P, O>> items;
+    private final ArrayList<ConfiguratorHolder<P, O>> fromItems;
+    private final HashMap<Integer, ConfiguratorHolder<P, O>> fromItemsWithPosition;
+    private final HashMap<Integer, HolderItem<P, O>> itemOnly;
     private final HashMap<Integer, ItemStack> itemPainting;
-    private final ArrayList<HolderItem<O>> itemOnlyToPlaceAtCenter;
+    private final ArrayList<HolderItem<P, O>> itemOnlyToPlaceAtCenter;
     private final short[] glasses;
     
     private final ChatColor[] colors;
@@ -70,13 +71,13 @@ public abstract class ConfiguratorHolderHandler<O extends Enum<O> & MessageType,
     private String titlePrefix;
     private boolean isAddons;
     
-    private final SkyUtilities main;
+    private final SkyUtilities<P> main;
     private int itemsStartPosition;
     private int itemsEndPosition;
     private final ArrayList<Integer> indexNotAvailableForPage;
     
     
-    public ConfiguratorHolderHandler(final SkyUtilities main) {
+    public ConfiguratorHolderHandler(final SkyUtilities<P> main) {
         super(main);
         this.indexColor = 0;
         this.itemsStartPosition = 0;
@@ -99,7 +100,7 @@ public abstract class ConfiguratorHolderHandler<O extends Enum<O> & MessageType,
     public void addPage(int itemsStartPosition, int itemsEndPosition, int positionLeft, int positionRight, O messageLeftType, O messageRightType,
                         String[] keysLeft, String[] keysRight,
                         ConfiguratorHolderMessageAPI[] valuesLeft, ConfiguratorHolderMessageAPI[] valuesRight,
-                        HolderItemAPI apiLeftItem, HolderItemAPI apiRightItem) {
+                        HolderItemAPI<P> apiLeftItem, HolderItemAPI<P> apiRightItem) {
         if (itemsStartPosition > itemsEndPosition) return;
         this.itemsStartPosition = itemsStartPosition;
         this.itemsEndPosition = itemsEndPosition;
@@ -118,7 +119,7 @@ public abstract class ConfiguratorHolderHandler<O extends Enum<O> & MessageType,
     public void addPage(int itemsStartPosition, int itemsEndPosition, O messageLeftType, O messageRightType,
                         String[] keysLeft, String[] keysRight,
                         ConfiguratorHolderMessageAPI[] valuesLeft, ConfiguratorHolderMessageAPI[] valuesRight,
-                        HolderItemAPI apiLeftItem, HolderItemAPI apiRightItem) {
+                        HolderItemAPI<P> apiLeftItem, HolderItemAPI<P> apiRightItem) {
         if (itemsStartPosition > itemsEndPosition) return;
         this.itemsStartPosition = itemsStartPosition;
         this.itemsEndPosition = itemsEndPosition;
@@ -192,11 +193,11 @@ public abstract class ConfiguratorHolderHandler<O extends Enum<O> & MessageType,
         fromItemsWithPosition.put(position, new ConfiguratorHolder<>(size, type, messageType, keys, values, item, api));
     }
     
-    public void add(int position, ItemCreator item, O messageType, String[] keys, ConfiguratorHolderMessageAPI[] values, HolderItemAPI apiItem) {
+    public void add(int position, ItemCreator item, O messageType, String[] keys, ConfiguratorHolderMessageAPI[] values, HolderItemAPI<P> apiItem) {
         itemOnly.put(position, new HolderItem<>(messageType, item, keys, values, apiItem));
     }
     
-    public void add(ItemCreator item, O messageType, String[] keys, ConfiguratorHolderMessageAPI[] values, HolderItemAPI apiItem) {
+    public void add(ItemCreator item, O messageType, String[] keys, ConfiguratorHolderMessageAPI[] values, HolderItemAPI<P> apiItem) {
         itemOnlyToPlaceAtCenter.add(new HolderItem<>(messageType, item, keys, values, apiItem));
     }
     
@@ -219,9 +220,8 @@ public abstract class ConfiguratorHolderHandler<O extends Enum<O> & MessageType,
         final int center = ((int) centerCalculate);
         
         final float linesCalculate = (amount / (sizeWeight - 2.0f));
-        final int lines = (((int) linesCalculate) < linesCalculate) ? (((int) linesCalculate) + 1) : ((int) linesCalculate);
         
-        int indexLines = lines;
+        int indexLines = (((int) linesCalculate) < linesCalculate) ? (((int) linesCalculate) + 1) : ((int) linesCalculate);
         int adding = 0;
         boolean up = false;
         boolean isAdding = true;
@@ -232,7 +232,7 @@ public abstract class ConfiguratorHolderHandler<O extends Enum<O> & MessageType,
             int c = 4;
             
             if (amount_index >= 8 || amount_index % 2 != 0) {
-                final HolderItem item = getFirstOrNull(array_index);
+                final HolderItem<P, O> item = getFirstOrNull(array_index);
                 amount_index--;
                 array_index++;
                 if (item == null) return indexes;
@@ -253,7 +253,7 @@ public abstract class ConfiguratorHolderHandler<O extends Enum<O> & MessageType,
                     return indexes;
                 
                 if (c_left <= 0 || c_right >= 8) return indexes;
-                final HolderItem item = getFirstOrNull(array_index);
+                final HolderItem<P, O> item = getFirstOrNull(array_index);
                 amount_index--;
                 array_index++;
                 if (item == null) return indexes;
@@ -275,11 +275,12 @@ public abstract class ConfiguratorHolderHandler<O extends Enum<O> & MessageType,
                     isAdding = true;
                 }
             }
-
-/*            if (c <= 7 && lines > 1) {
-                c = ((center - ((sizeWeight / 2) - 1)) - 1);
-            }*/
             
+/*
+            if (c <= 7 && lines > 1) {
+                c = ((center - ((sizeWeight / 2) - 1)) - 1);
+            }
+            */
             
             if (c >= (slots + 1)) return indexes;
             
@@ -338,7 +339,7 @@ public abstract class ConfiguratorHolderHandler<O extends Enum<O> & MessageType,
             for (int i = spaceBetweenItemsAndBorderRightAndLeft; i < (9 - spaceBetweenItemsAndBorderRightAndLeft); i++) {
                 
                 if (i == spaceBetweenItemsAndBorderRightAndLeft && (amount_index > 8 - (spaceBetweenItemsAndBorderRightAndLeft + spaceBetweenItemsAndBorderRightAndLeft) || amount_index % 2 != 0)) {
-                    final HolderItem item = getFirstOrNull(array_index);
+                    final HolderItem<P, O> item = getFirstOrNull(array_index);
                     amount_index--;
                     array_index++;
                     if (item == null) return indexes;
@@ -351,7 +352,7 @@ public abstract class ConfiguratorHolderHandler<O extends Enum<O> & MessageType,
                 if (add) c_right += 1;
                 else c_left -= 1;
                 
-                final HolderItem item = getFirstOrNull(array_index);
+                final HolderItem<P, O> item = getFirstOrNull(array_index);
                 amount_index--;
                 array_index++;
                 if (item == null) return indexes;
@@ -377,7 +378,7 @@ public abstract class ConfiguratorHolderHandler<O extends Enum<O> & MessageType,
         final int size = itemOnlyToPlaceAtCenter.size();
         for (int i = 0; i < size; i++) {
             
-            final HolderItem<O> item = itemOnlyToPlaceAtCenter.size() <= i ? null : itemOnlyToPlaceAtCenter.get(i);
+            final HolderItem<P, O> item = itemOnlyToPlaceAtCenter.size() <= i ? null : itemOnlyToPlaceAtCenter.get(i);
             if (item == null) return;
             
             final Integer index = indexes.size() <= i ? null : indexes.get(i);
@@ -387,53 +388,53 @@ public abstract class ConfiguratorHolderHandler<O extends Enum<O> & MessageType,
         }
     }
     
-    private HolderItem<O> getFirstOrNull(int array_index) {
+    private HolderItem<P, O> getFirstOrNull(int array_index) {
         return itemOnlyToPlaceAtCenter.size() <= array_index ? null : itemOnlyToPlaceAtCenter.get(array_index);
     }
     
     
-    public <T extends Enum<T>> void place(final LangMessageHandler<T, O> langMessageHandler,
-                                          final Player player, final ItemStack[] itemSlot, String addons, Lang<T, O, String> lang) {
+    public <T extends Enum<T>> void place(final P plugin, final LangMessageHandler<T, O> langMessageHandler,
+                                          final Player player, final ItemStack[] itemSlot, String addons, T lang) {
         if (!itemPainting.isEmpty()) itemPainting.forEach((integer, itemStack) -> {
             if (itemSlot[integer] == null) itemSlot[integer] = itemStack;
         });
-        for (Map.Entry<Integer, ConfiguratorHolderItem<O>> items : items.entrySet()) {
-            final ConfiguratorHolderItem<O> value = items.getValue();
+        for (Map.Entry<Integer, ConfiguratorHolderItem<P, O>> items : items.entrySet()) {
+            final ConfiguratorHolderItem<P, O> value = items.getValue();
             if (value.getType() == null) {
                 itemSlot[items.getKey()] = value.getItem().getItem();
                 continue;
             }
             itemSlot[items.getKey()] = value.getKeys() == null ? value.getItem().setName(main.getAPI().getMessageAPI().getMessage(langMessageHandler, value.getType(),
                     lang)).getItem() : value.getItem().setName(main.getAPI().getMessageAPI().getMessage(langMessageHandler, value.getType(), lang, value.getKeys(),
-                    Arrays.stream(value.getValue()).map(configuratorHolderMessageAPI -> configuratorHolderMessageAPI.get(main, player)).toArray(String[]::new))).getItem();
+                    Arrays.stream(value.getValue()).map(configuratorHolderMessageAPI -> configuratorHolderMessageAPI.get(player)).toArray(String[]::new))).getItem();
         }
-        for (Map.Entry<Integer, HolderItem<O>> item : itemOnly.entrySet()) {
-            final HolderItem<O> value = item.getValue();
+        for (Map.Entry<Integer, HolderItem<P, O>> item : itemOnly.entrySet()) {
+            final HolderItem<P, O> value = item.getValue();
             if (item.getValue().getType() == null) {
                 itemSlot[item.getKey()] = value.getItem() == null ? null : value.getItem().getItem();
                 continue;
             }
             itemSlot[item.getKey()] = item.getValue().getKeys() == null ? value.getItem().setName(main.getAPI().getMessageAPI().getMessage(langMessageHandler, value.getType(),
                     lang)).getItem() : value.getItem().setName(main.getAPI().getMessageAPI().getMessage(langMessageHandler, value.getType(), lang, value.getKeys(),
-                    Arrays.stream(value.getValue()).map(configuratorHolderMessageAPI -> configuratorHolderMessageAPI.get(main, player)).toArray(String[]::new))).getItem();
+                    Arrays.stream(value.getValue()).map(configuratorHolderMessageAPI -> configuratorHolderMessageAPI.get(player)).toArray(String[]::new))).getItem();
         }
     }
     
-    protected <T extends Enum<T>> void placePage(final LangMessageHandler<T, O> langMessageHandler,
+    protected <T extends Enum<T>> void placePage(final P plugin, final LangMessageHandler<T, O> langMessageHandler,
                                                  final Player player, final ItemStack[] itemSlot,
-                                                 String addons, ArrayList<HolderItem<O>> allItemsForPage,
-                                                 Lang<T, O, String> lang) {
+                                                 String addons, ArrayList<HolderItem<P, O>> allItemsForPage,
+                                                 T lang) {
         if (!allItemsForPage.isEmpty()) {
             final ArrayList<Integer> spaces = getSpace();
             final int size = spaces.size();
-            List<HolderItem<O>> items = PageUtils.getPageItems(allItemsForPage, getPageFromTitle(addons), size);
+            List<HolderItem<P, O>> items = PageUtils.getPageItems(allItemsForPage, getPageFromTitle(addons), size);
             if (items.isEmpty()) return;
             for (int i = 0; i < size; i++) {
                 if (indexNotAvailableForPage.contains(i)) continue;
                 Integer index = spaces.get(i);
                 if (index == null) continue;
                 if (items.size() <= i) return;
-                HolderItem<O> item = items.get(i);
+                HolderItem<P, O> item = items.get(i);
                 if (item == null) continue;
                 if (item.getType() == null) {
                     itemSlot[index] = item.getItem().getItem();
@@ -441,26 +442,26 @@ public abstract class ConfiguratorHolderHandler<O extends Enum<O> & MessageType,
                 }
                 itemSlot[index] = item.getKeys() == null ? item.getItem().setName(main.getAPI().getMessageAPI().getMessage(langMessageHandler, item.getType(),
                         lang)).getItem() : item.getItem().setName(main.getAPI().getMessageAPI().getMessage(langMessageHandler, item.getType(), lang, item.getKeys(),
-                        Arrays.stream(item.getValue()).map(configuratorHolderMessageAPI -> configuratorHolderMessageAPI.get(main, player)).toArray(String[]::new))).getItem();
+                        Arrays.stream(item.getValue()).map(configuratorHolderMessageAPI -> configuratorHolderMessageAPI.get(player)).toArray(String[]::new))).getItem();
             }
         }
     }
     
-    protected <T extends Enum<T>> void placePageWithLore(final LangLinesWithTitleHandler<T, L> langLinesWithTitleHandler,
+    protected <T extends Enum<T>> void placePageWithLore(final P plugin, final LangLinesWithTitleHandler<T, L> langLinesWithTitleHandler,
                                                          final Player player, final ItemStack[] itemSlot, String addons,
-                                                         ArrayList<HolderItemWithLore<L>> allItemsForPage,
-                                                         Lang<T, L, MessagesHolder> lang) {
+                                                         ArrayList<HolderItemWithLore<P, L>> allItemsForPage,
+                                                         T lang) {
         if (!allItemsForPage.isEmpty()) {
             final ArrayList<Integer> spaces = getSpace();
             final int size = spaces.size();
-            List<HolderItemWithLore<L>> items = PageUtils.getPageItems(allItemsForPage, getPageFromTitle(addons), size);
+            List<HolderItemWithLore<P, L>> items = PageUtils.getPageItems(allItemsForPage, getPageFromTitle(addons), size);
             if (items.isEmpty()) return;
             for (int i = 0; i < size; i++) {
                 if (indexNotAvailableForPage.contains(i)) continue;
                 Integer index = spaces.get(i);
                 if (index == null) continue;
                 if (items.size() <= i) return;
-                HolderItemWithLore<L> item = items.get(i);
+                HolderItemWithLore<P, L> item = items.get(i);
                 if (item == null) continue;
                 if (item.getType() == null) {
                     itemSlot[index] = item.getItem().getItem();
@@ -468,7 +469,7 @@ public abstract class ConfiguratorHolderHandler<O extends Enum<O> & MessageType,
                 }
                 ArrayList<String> lore = new ArrayList<>();
                 MessagesHolder itemMessage = main.getAPI().getMessageAPI().getLinesWithTitle(langLinesWithTitleHandler, item.getType(), lang, item.getKeys(),
-                        Arrays.stream(item.getValue()).map(configuratorHolderMessageAPI -> configuratorHolderMessageAPI.get(main, player)).toArray(String[]::new));
+                        Arrays.stream(item.getValue()).map(configuratorHolderMessageAPI -> configuratorHolderMessageAPI.get(player)).toArray(String[]::new));
                 itemSlot[index] = item.getKeys() == null ? item.getItem().setName(itemMessage.getTitle()).getItem() :
                         item.getItem().setName(itemMessage.getTitle()).addLore(itemMessage.getLines()).getItem();
             }
@@ -498,7 +499,7 @@ public abstract class ConfiguratorHolderHandler<O extends Enum<O> & MessageType,
         return title.equals(getName(""));
     }
     
-    private void initialize(final Integer position, final ConfiguratorHolder<O> holder) {
+    private void initialize(final Integer position, final ConfiguratorHolder<P, O> holder) {
         final Integer center = position == null ? getCenter() : position;
         if (center == null) return;
         
@@ -515,10 +516,10 @@ public abstract class ConfiguratorHolderHandler<O extends Enum<O> & MessageType,
     }
     
     @Override
-    public void onClick(Player player, InventoryClickEvent e, ItemStack currentItem, ItemMeta meta) {
+    public void onClick(final P plugin, Player player, InventoryClickEvent e, ItemStack currentItem, ItemMeta meta) {
         e.setCancelled(true);
         if (meta == null || meta.getDisplayName() == null) return;
-        onClick(e, meta.getDisplayName(), player, currentItem, meta);
+        onClick(plugin, e, meta.getDisplayName(), player, currentItem, meta);
     }
     
     private Integer getCenter() {
@@ -547,13 +548,25 @@ public abstract class ConfiguratorHolderHandler<O extends Enum<O> & MessageType,
         return iCenter;
     }
     
-    public boolean onClick(final InventoryClickEvent e, final String name, final Player player, ItemStack currentItem, ItemMeta meta) {
-        if ((e.getClickedInventory() instanceof CraftInventoryPlayer)) return false;
+    private static String getServerVersion() {
+        String version;
+        try {
+            
+            version = Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];
+            
+        } catch (ArrayIndexOutOfBoundsException whatVersionAreYouUsingException) {
+            return "unknown";
+        }
+        return version;
+    }
+    
+    @SuppressWarnings("UnusedReturnValue")
+    public boolean onClick(final P plugin, final InventoryClickEvent e, final String name, final Player player, ItemStack currentItem, ItemMeta meta) {
         if (name == null || name.equals("") || name.equals("§r")) return false;
-        final HolderItem<O> apiItem = itemOnly.get(e.getRawSlot());
+        final HolderItem<P, O> apiItem = itemOnly.get(e.getRawSlot());
         if (apiItem != null) {
             if (apiItem.getAPI() == null) return false;
-            apiItem.getAPI().perform(main, name, player, e.getClickedInventory().getTitle(), e);
+            apiItem.getAPI().perform(plugin, name, player, e.getClickedInventory().getTitle(), e);
             return false;
         }
         final ConfiguratorHolderData api = cache.get(name);
@@ -570,7 +583,7 @@ public abstract class ConfiguratorHolderHandler<O extends Enum<O> & MessageType,
         int up = center;
         boolean isDown = true;
         for (int i = 0; i < size; i++) {
-            final ConfiguratorHolder<O> holder = isDown ? fromItems.get(down) : fromItems.get(up);
+            final ConfiguratorHolder<P, O> holder = isDown ? fromItems.get(down) : fromItems.get(up);
             initialize(null, holder);
             if (isDown) down = down - 1;
             else up = up + 1;
@@ -596,7 +609,7 @@ public abstract class ConfiguratorHolderHandler<O extends Enum<O> & MessageType,
         int up = center;
         boolean isDown = true;
         for (int i = 0; i < size; i++) {
-            final ConfiguratorHolder<O> holder = isDown ? fromItems.get(down) : fromItems.get(up);
+            final ConfiguratorHolder<P, O> holder = isDown ? fromItems.get(down) : fromItems.get(up);
             initialize(null, holder);
             if (isDown) down = down - 1;
             else up = up + 1;

@@ -1,14 +1,37 @@
 package com.xeross.skyutilities.helpers.utils;
 
-import lombok.NonNull;
+
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
+@SuppressWarnings("unused")
 public class PingUtils {
     
-    public static String getPing(@NonNull Player player) {
-        final int ping = ((CraftPlayer) player).getHandle().ping;
+    private static String getServerVersion() {
+        String version;
+        try {
+            
+            version = Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];
+            
+        } catch (ArrayIndexOutOfBoundsException whatVersionAreYouUsingException) {
+            return "unknown";
+        }
+        return version;
+    }
+    
+    @SuppressWarnings("unused")
+    public static String getPing(Player player) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Class<?> clazz = Class.forName("org.bukkit.craftbukkit." + getServerVersion() + ".entity.CraftPlayer");
+        Class<?> entityPlayer = Class.forName("org.bukkit.craftbukkit." + getServerVersion() + ".entity.EntityPlayer");
+        Class<?> cast = clazz.cast(player).getClass();
+        Method handle = cast.getDeclaredMethod("getHandle");
+        Class<?> invoke = handle.invoke(entityPlayer).getClass();
+        Method pingMethod = invoke.getMethod("ping");
+        int ping = (int) pingMethod.invoke(int.class);
         String pingToString = PingType.GOOD.getColor().toString() + ping;
         if (ping <= PingType.GOOD.getMaxPing()) {
             pingToString = PingType.GOOD.getColor().toString() + ping;

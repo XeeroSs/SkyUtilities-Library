@@ -14,9 +14,9 @@ import java.util.*;
 
 public class LangLinesWithTitleHandler<T extends Enum<T>, O extends Enum<O> & MessageType> implements MainAPI {
     
-    private final HashMap<Lang<T, O, MessagesHolder>, HashMap<O, MessagesHolder>> lines;
+    private final HashMap<T, HashMap<O, MessagesHolder>> lines;
     
-    public HashMap<Lang<T, O, MessagesHolder>, HashMap<O, MessagesHolder>> getLines() {
+    public HashMap<T, HashMap<O, MessagesHolder>> getLines() {
         return lines;
     }
     
@@ -25,12 +25,12 @@ public class LangLinesWithTitleHandler<T extends Enum<T>, O extends Enum<O> & Me
         onReload();
     }
     
-    public MessagesHolder getMessage(O path, Lang<T, O, MessagesHolder> lang) {
+    public MessagesHolder getMessage(O path, T lang) {
         return lines.get(lang).get(path);
     }
     
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    private void registerLinesWithTitle(Lang<T, O, MessagesHolder> lang, File file, String prefixPath) throws Exception {
+    @SuppressWarnings({"ResultOfMethodCallIgnored", "unused"})
+    public void registerLinesWithTitle(Lang<T, O, MessagesHolder> lang, File file, String prefixPath) {
         boolean fileCreated = false;
         if (!file.exists()) {
             try {
@@ -61,7 +61,8 @@ public class LangLinesWithTitleHandler<T extends Enum<T>, O extends Enum<O> & Me
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            lines.put(lang, fileMessages);
+            lines.put(lang.getType(), fileMessages);
+            return;
         }
         
         final HashMap<O, MessagesHolder> fileMessages = new LinkedHashMap<>();
@@ -87,7 +88,7 @@ public class LangLinesWithTitleHandler<T extends Enum<T>, O extends Enum<O> & Me
         } catch (IOException e) {
             e.printStackTrace();
         }
-        lines.put(lang, fileMessages);
+        lines.put(lang.getType(), fileMessages);
     }
     
     @Override

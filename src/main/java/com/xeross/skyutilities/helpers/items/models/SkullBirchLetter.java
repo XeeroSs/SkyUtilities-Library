@@ -3,8 +3,9 @@ package com.xeross.skyutilities.helpers.items.models;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
+@SuppressWarnings("unused")
 public enum SkullBirchLetter {
-
+    
     A("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2ViMmE5NTg2Mjg5ZjM1YjJkNWYyYjFkYjI5NmNiNzc1MjhlMjBiNzkwM2U3N2NjNTNhYWM1MzhkNTk2NzMifX19"),
     B("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjQ3MjU3YWZkMzE1MThkOTRlODAyZTk5MzU2MjZiZjkzZTU1YWE2Zjc3YjU2YmE3ZTM3ZjhiZTRlNTdkMSJ9fX0="),
     C("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYWQ3NjUxYmM4NmI2YWJkODllZTdlYTY1NGQ0NjkwY2E2NDc0ZmFlMWY3ZjZkMjhiYzdkNGU0MTE2YTc0In19fQ=="),
@@ -31,20 +32,20 @@ public enum SkullBirchLetter {
     X("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWY3NGQ0ZGI0Y2MzYmU0MWEzNzNkOWVmOWNhYzI3ZTYzNThjNTNmNjQxMTVkMTUwMjQzZjI1YWNmNjRmMmY1MCJ9fX0="),
     Y("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzljMTBkODI4MzkyNmQ3MjBmZDNkZTE1YzRlNGNkM2UxNTlmYjI1NmY3ZmE4ZDg5N2ViMmYxNGFiOGExOCJ9fX0="),
     Z("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDY0OTE3YzI0MTQ5NDFlZmY3ZTAxYmM5YmQxNTljNjk5ZTliZWUyZDg4ZTMxNWVhZDJiOWNlYzBjYmU1MWM5OCJ9fX0=");
-
-
+    
+    
     private final ItemStack defaultMaterial;
     private final String base64;
-
+    
     SkullBirchLetter(String base64) {
         this.defaultMaterial = new ItemStack(Material.PAPER);
         this.base64 = base64;
     }
-
+    
     public ItemStack getDefaultMaterial() {
         return defaultMaterial;
     }
-
+    
     public String getBase64() {
         return base64;
     }

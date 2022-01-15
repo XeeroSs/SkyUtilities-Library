@@ -1,7 +1,5 @@
 package com.xeross.skyutilities.helpers.utils.api;
 
-import com.sun.istack.internal.Nullable;
-import lombok.NonNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,6 +7,7 @@ import java.util.HashMap;
 /**
  * @author XeroSs
  */
+@SuppressWarnings("unused")
 public interface UtilsAPI {
     
     /**
@@ -24,7 +23,7 @@ public interface UtilsAPI {
     /**
      * @return element from array. Return null if array is null or index is not correct.
      */
-    <T> T getElementFromArrayOrNull(final @Nullable T[] array, final int index);
+    <T> T getElementFromArrayOrNull(final T[] array, final int index);
     /**
      * @return next element by {}.
      */
@@ -35,9 +34,11 @@ public interface UtilsAPI {
     /**
      * @return 'dd/MM/yy HH:mm'.
      */
-    @NonNull String getDateAndHourToString();
+    
+    String getDateAndHourToString();
     /**
      * @return 'mm:ss'.
      */
-    @NonNull String getFormatTimeFromSecond(final int timeQueue);
+    
+    String getFormatTimeFromSecond(final int timeQueue);
 }

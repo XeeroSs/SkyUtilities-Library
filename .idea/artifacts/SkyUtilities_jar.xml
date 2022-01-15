@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="SkyUtilities:jar">
+    <output-path>$USER_HOME$/Desktop/SylensNetwork/JAVA/libs</output-path>
+    <root id="archive" name="SkyUtilities.jar">
+      <element id="module-output" name="SkyUtilities" />
+    </root>
+  </artifact>
+</component>

@@ -1,8 +1,8 @@
 package com.xeross.skyutilities.helpers.messages;
 
 import com.xeross.skyutilities.core.api.MainAPI;
-import com.xeross.skyutilities.helpers.messages.api.MessageType;
 import com.xeross.skyutilities.helpers.messages.api.Lang;
+import com.xeross.skyutilities.helpers.messages.api.MessageType;
 import com.xeross.skyutilities.helpers.utils.files.utils.UTFConfig;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -13,9 +13,9 @@ import java.util.*;
 
 public class LangLinesHandler<T extends Enum<T>, O extends Enum<O> & MessageType> implements MainAPI {
     
-    private final HashMap<Lang<T, O, ArrayList<String>>, HashMap<O, ArrayList<String>>> lines;
+    private final HashMap<T, HashMap<O, ArrayList<String>>> lines;
     
-    public HashMap<Lang<T, O, ArrayList<String>>, HashMap<O, ArrayList<String>>> getLines() {
+    public HashMap<T, HashMap<O, ArrayList<String>>> getLines() {
         return lines;
     }
     
@@ -24,12 +24,12 @@ public class LangLinesHandler<T extends Enum<T>, O extends Enum<O> & MessageType
         onReload();
     }
     
-    public ArrayList<String> getMessage(O path, Lang<T, O, ArrayList<String>> lang) {
+    public ArrayList<String> getMessage(O path, T lang) {
         return lines.get(lang).get(path);
     }
     
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    private void registerMessages(Lang<T, O, ArrayList<String>> lang, File file, String prefixPath) throws Exception {
+    @SuppressWarnings({"ResultOfMethodCallIgnored", "unused"})
+    public void registerMessages(Lang<T, O, ArrayList<String>> lang, File file, String prefixPath) {
         boolean fileCreated = false;
         if (!file.exists()) {
             try {
@@ -57,7 +57,7 @@ public class LangLinesHandler<T extends Enum<T>, O extends Enum<O> & MessageType
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            lines.put(lang, fileMessages);
+            lines.put(lang.getType(), fileMessages);
         }
         
         final HashMap<O, ArrayList<String>> fileMessages = new LinkedHashMap<>();
@@ -78,7 +78,7 @@ public class LangLinesHandler<T extends Enum<T>, O extends Enum<O> & MessageType
         } catch (IOException e) {
             e.printStackTrace();
         }
-        lines.put(lang, fileMessages);
+        lines.put(lang.getType(), fileMessages);
     }
     
     @Override

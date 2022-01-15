@@ -9,6 +9,7 @@ import java.util.Map;
 
 public interface ConfiguratorHolderPaintingAPI {
     
+    @SuppressWarnings("rawtypes")
     Map<Integer, ItemStack> painting(final SkyUtilities main, final int slots, final ItemCreator[] material, final ConfiguratorHolderPaintingMaterialType configuratorHolderPaintingMaterialType);
     
 }

@@ -1,6 +1,6 @@
 package com.xeross.skyutilities.helpers.gui.api;
 
-import com.sun.istack.internal.Nullable;
+
 import com.xeross.skyutilities.SkyUtilities;
 import com.xeross.skyutilities.helpers.items.utils.ItemCreator;
 import org.bukkit.Material;
@@ -9,14 +9,15 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.Plugin;
 
-public abstract class GUI {
+public abstract class GUI<P extends Plugin> {
     
     private final String BACK = "§c§l↩ Retour";
     private final ItemStack itemStack;
-    private final SkyUtilities main;
+    private final SkyUtilities<P> main;
     
-    public GUI(SkyUtilities main) {
+    public GUI(SkyUtilities<P> main) {
         this.itemStack = new ItemCreator(Material.ARROW).setName(BACK).getItem();
         this.main = main;
     }
@@ -36,7 +37,7 @@ public abstract class GUI {
      * <p>
      * 45 46 47 48 49 50 51 52 53
      **/
-    public abstract ItemStack[] getContents(Player player, String addonsForTile, @Nullable String[] addons);
+    public abstract ItemStack[] getContents(Player player, String addonsForTile, String[] addons);
     
     public abstract void animated(Player player, Inventory inventory, String addonsForTile);
     
@@ -50,16 +51,18 @@ public abstract class GUI {
         return (getSize() * 9);
     }
     
-    public abstract void onClick(Player player, InventoryClickEvent e, ItemStack currentItem, ItemMeta meta);
-    
+    @SuppressWarnings("unused")
     protected void placeItemBack(final ItemStack[] array_items) {
         final int position = (getSlots() - 1);
         array_items[position] = itemStack;
     }
     
-    protected boolean onBackClick(String name, Player player, Class<? extends GUI> gui) {
+    @SuppressWarnings({"unused"})
+    protected boolean onBackClick(String name, Player player, Class<? extends GUI<P>> gui) {
         if (!name.equals(BACK)) return false;
         main.getAPI().getGUIAPI().open(player, gui, "1", null);
         return true;
     }
+    
+    public abstract void onClick(P plugin, Player player, InventoryClickEvent e, ItemStack currentItem, ItemMeta meta);
 }

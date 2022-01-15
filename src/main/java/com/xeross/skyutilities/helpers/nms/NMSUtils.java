@@ -3,8 +3,9 @@ package com.xeross.skyutilities.helpers.nms;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+@SuppressWarnings("unused")
 public class NMSUtils {
-
+    
     public static void sendPacket(Player player, Object packet) {
         try {
             Object handle = player.getClass().getMethod("getHandle").invoke(player);
@@ -14,7 +15,7 @@ public class NMSUtils {
             e.printStackTrace();
         }
     }
-
+    
     public static Class<?> getNMSClass(String name) {
         try {
             return Class.forName("net.minecraft.server." + Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3] + "." + name);

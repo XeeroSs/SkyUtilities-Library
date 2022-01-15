@@ -6,7 +6,6 @@ import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.craftbukkit.libs.jline.internal.InputStreamReader;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.representer.Representer;
@@ -21,7 +20,7 @@ import java.util.logging.Level;
 
 @SuppressWarnings("SpellCheckingInspection")
 public class UTFConfig extends YamlConfiguration {
-
+    
     public UTFConfig(File file) {
         try {
             load(file);
@@ -29,7 +28,7 @@ public class UTFConfig extends YamlConfiguration {
             Bukkit.getLogger().log(Level.SEVERE, "Could not load Configuration " + file.getName(), e);
         }
     }
-
+    
     @SuppressWarnings({"UnstableApiUsage", "TryFinallyCanBeTryWithResources"})
     @Override
     public void save(File file) throws IOException {
@@ -37,39 +36,39 @@ public class UTFConfig extends YamlConfiguration {
         Files.createParentDirs(file);
         String data = this.saveToString();
         Writer writer = new OutputStreamWriter(new FileOutputStream(file), Charsets.UTF_8);
-
+        
         try {
             writer.write(data);
         } finally {
             writer.close();
         }
     }
-
+    
     @Override
     public String saveToString() {
         try {
             Field optionField = Reflections.getField(getClass(), "yamlOptions");
             Field representerField = Reflections.getField(getClass(), "yamlRepresenter");
             Field yamlField = Reflections.getField(getClass(), "yaml");
-
+            
             if (optionField != null && representerField != null && yamlField != null) {
                 optionField.setAccessible(true);
                 representerField.setAccessible(true);
                 yamlField.setAccessible(true);
-
+                
                 DumperOptions yamlOptions = (DumperOptions) optionField.get(this);
                 Representer yamlRepresenter = (Representer) representerField.get(this);
                 Yaml yaml = (Yaml) yamlField.get(this);
                 DumperOptions.FlowStyle flow = DumperOptions.FlowStyle.BLOCK;
-
+                
                 yamlOptions.setIndent(this.options().indent());
                 yamlOptions.setDefaultFlowStyle(flow);
                 yamlOptions.setAllowUnicode(true);
                 yamlRepresenter.setDefaultFlowStyle(flow);
-
+                
                 String header = this.buildHeader();
                 String dump = yaml.dump(this.getValues(false));
-
+                
                 if (dump.equals("{}\n")) dump = "";
                 return header + dump;
             }
@@ -78,21 +77,21 @@ public class UTFConfig extends YamlConfiguration {
         }
         return "Error: Cannot be saved to String";
     }
-
+    
     @Override
     public void load(File file) throws IOException, InvalidConfigurationException {
         Validate.notNull(file, "File can't be null");
         this.load(new InputStreamReader(new FileInputStream(file), Charsets.UTF_8));
     }
-
+    
     public static class Reflections {
-
+        
         public static final Field modifiers = getField(Field.class, "modifiers");
-
+        
         public Reflections() {
             setAccessible(true, modifiers);
         }
-
+        
         public static void setAccessible(boolean state, Field... fields) {
             try {
                 for (Field field : fields) {
@@ -106,7 +105,7 @@ public class UTFConfig extends YamlConfiguration {
                 Bukkit.getLogger().log(Level.WARNING, "Could not set Fields accessible", ex);
             }
         }
-
+        
         public static Field getField(Class<?> clazz, String name) {
             Field field = null;
             for (Field f : getFields(clazz)) {
@@ -114,17 +113,17 @@ public class UTFConfig extends YamlConfiguration {
             }
             return field;
         }
-
+        
         public static List<Field> getFields(Class<?> clazz) {
             List<Field> buf = new ArrayList<>();
-
+            
             do {
                 try {
                     Collections.addAll(buf, clazz.getDeclaredFields());
                 } catch (Exception ignored) {
                 }
             } while ((clazz = clazz.getSuperclass()) != null);
-
+            
             return buf;
         }
     }

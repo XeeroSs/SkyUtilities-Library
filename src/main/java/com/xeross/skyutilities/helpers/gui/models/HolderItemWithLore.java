@@ -4,16 +4,17 @@ import com.xeross.skyutilities.helpers.gui.api.ConfiguratorHolderMessageAPI;
 import com.xeross.skyutilities.helpers.gui.api.HolderItemAPI;
 import com.xeross.skyutilities.helpers.items.utils.ItemCreator;
 import com.xeross.skyutilities.helpers.messages.api.MessageType;
+import org.bukkit.plugin.Plugin;
 
-public class HolderItemWithLore<O extends Enum<O> & MessageType> {
+public class HolderItemWithLore<P extends Plugin, O extends Enum<O> & MessageType> {
     
     private final O type;
     private final ItemCreator item;
     private final String[] keys;
     private final ConfiguratorHolderMessageAPI[] value;
-    private final HolderItemAPI api;
+    private final HolderItemAPI<P> api;
     
-    public HolderItemWithLore(O type, ItemCreator item, String[] keys, ConfiguratorHolderMessageAPI[] value, HolderItemAPI api) {
+    public HolderItemWithLore(O type, ItemCreator item, String[] keys, ConfiguratorHolderMessageAPI[] value, HolderItemAPI<P> api) {
         this.type = type;
         this.item = item;
         this.keys = keys;
@@ -37,7 +38,8 @@ public class HolderItemWithLore<O extends Enum<O> & MessageType> {
         return item;
     }
     
-    public HolderItemAPI getAPI() {
+    @SuppressWarnings("unused")
+    public HolderItemAPI<P> getAPI() {
         return api;
     }
 }

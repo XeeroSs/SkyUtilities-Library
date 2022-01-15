@@ -1,11 +1,10 @@
 package com.xeross.skyutilities;
 
-import com.avaje.ebean.validation.NotNull;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 
+@SuppressWarnings("unused")
 public interface GlobalAPI {
     String[] getKeysAntiSpam();
     String[] getValuesAntiSpam();

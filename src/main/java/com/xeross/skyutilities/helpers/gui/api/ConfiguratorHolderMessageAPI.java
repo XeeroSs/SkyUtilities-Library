@@ -1,8 +1,8 @@
 package com.xeross.skyutilities.helpers.gui.api;
 
-import com.xeross.skyutilities.SkyUtilities;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 public interface ConfiguratorHolderMessageAPI {
-    String get(SkyUtilities m, Player p);
+    String get(Player p);
 }

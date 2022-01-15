@@ -4,7 +4,6 @@ import com.xeross.skyutilities.helpers.utils.files.api.YamlFileAPI;
 import com.xeross.skyutilities.helpers.utils.files.api.YamlFileDataAPI;
 import com.xeross.skyutilities.helpers.utils.files.utils.UTFConfig;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.plugin.Plugin;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,6 +15,7 @@ import java.util.Map;
  * @author XeroSs
  * @version 1.0.0
  */
+@SuppressWarnings("unused")
 public abstract class YamlFileUtils<E extends Enum<E> & YamlFileDataAPI> implements YamlFileAPI<E> {
     
     private File file;
@@ -30,19 +30,19 @@ public abstract class YamlFileUtils<E extends Enum<E> & YamlFileDataAPI> impleme
         return objects;
     }
     
-    public YamlFileUtils(final Class<E> clazz, final String parentFile, final String file, Plugin main) {
+    public YamlFileUtils(final Class<E> clazz, final String parentFile, final String file) {
         this.typeDataForAll = null;
         this.prefixPath = "";
-        build(main, clazz, parentFile, file);
+        build(clazz, parentFile, file);
     }
     
-    public YamlFileUtils(final Class<E> clazz, final String parentFile, final String file, Plugin main, final String prefixPath, Class<?> typeDataForAll) {
+    public YamlFileUtils(final Class<E> clazz, final String parentFile, final String file, final String prefixPath, Class<?> typeDataForAll) {
         this.typeDataForAll = typeDataForAll;
         this.prefixPath = prefixPath;
-        build(main, clazz, parentFile, file);
+        build(clazz, parentFile, file);
     }
     
-    private void build(Plugin main, Class<E> clazz, final String parentFile, final String file) {
+    private void build(Class<E> clazz, final String parentFile, final String file) {
         this.clazz = clazz;
         this.file = new File(parentFile, file);
         this.parentFile = parentFile;

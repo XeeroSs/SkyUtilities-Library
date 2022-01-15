@@ -3,6 +3,7 @@ package com.xeross.skyutilities.helpers.gui.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("unused")
 public class PageUtils {
     
     public static <T> List<T> getPageItems(List<T> itemStackList, int page, int spaces) {

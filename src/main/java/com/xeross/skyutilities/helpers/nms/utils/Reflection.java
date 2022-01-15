@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
  *
  * @author Kristian
  */
+@SuppressWarnings({"FieldMayBeFinal", "JavaDoc", "GrazieInspection", "SpellCheckingInspection", "unused", "RegExpRedundantEscape"})
 public final class Reflection {
     /**
      * An interface for invoking a specific constructor.
@@ -27,7 +28,7 @@ public final class Reflection {
          */
         Object invoke(Object... arguments);
     }
-
+    
     /**
      * An interface for invoking a specific method.
      */
@@ -41,7 +42,7 @@ public final class Reflection {
          */
         Object invoke(Object target, Object... arguments);
     }
-
+    
     /**
      * An interface for retrieving the field content.
      *
@@ -55,7 +56,7 @@ public final class Reflection {
          * @return The value of the field.
          */
         T get(Object target);
-
+        
         /**
          * Set the content of a field.
          *
@@ -63,7 +64,7 @@ public final class Reflection {
          * @param value  - the new value of the field.
          */
         void set(Object target, Object value);
-
+        
         /**
          * Determine if the given object has this field.
          *
@@ -72,19 +73,19 @@ public final class Reflection {
          */
         boolean hasField(Object target);
     }
-
+    
     // Deduce the net.minecraft.server.v* package
     private static String OBC_PREFIX = Bukkit.getServer().getClass().getPackage().getName();
     private static String NMS_PREFIX = OBC_PREFIX.replace("org.bukkit.craftbukkit", "net.minecraft.server");
     private static String VERSION = OBC_PREFIX.replace("org.bukkit.craftbukkit", "").replace(".", "");
-
+    
     // Variable replacement
     private static Pattern MATCH_VARIABLE = Pattern.compile("\\{([^}]+)\\}");
-
+    
     private Reflection() {
         // Seal class
     }
-
+    
     /**
      * Retrieve a field accessor for a specific field type and name.
      *
@@ -96,7 +97,7 @@ public final class Reflection {
     public static <T> FieldAccessor<T> getField(Class<?> target, String name, Class<T> fieldType) {
         return getField(target, name, fieldType, 0);
     }
-
+    
     /**
      * Retrieve a field accessor for a specific field type and name.
      *
@@ -108,7 +109,7 @@ public final class Reflection {
     public static <T> FieldAccessor<T> getField(String className, String name, Class<T> fieldType) {
         return getField(getClass(className), name, fieldType, 0);
     }
-
+    
     /**
      * Retrieve a field accessor for a specific field type and name.
      *
@@ -120,7 +121,7 @@ public final class Reflection {
     public static <T> FieldAccessor<T> getField(Class<?> target, Class<T> fieldType, int index) {
         return getField(target, null, fieldType, index);
     }
-
+    
     /**
      * Retrieve a field accessor for a specific field type and name.
      *
@@ -132,16 +133,16 @@ public final class Reflection {
     public static <T> FieldAccessor<T> getField(String className, Class<T> fieldType, int index) {
         return getField(getClass(className), fieldType, index);
     }
-
+    
     // Common method
     private static <T> FieldAccessor<T> getField(Class<?> target, String name, Class<T> fieldType, int index) {
         for (final Field field : target.getDeclaredFields()) {
             if ((name == null || field.getName().equals(name)) && fieldType.isAssignableFrom(field.getType()) && index-- <= 0) {
                 field.setAccessible(true);
-
+                
                 // A function for retrieving a specific field value
                 return new FieldAccessor<T>() {
-
+                    
                     @Override
                     @SuppressWarnings("unchecked")
                     public T get(Object target) {
@@ -151,7 +152,7 @@ public final class Reflection {
                             throw new RuntimeException("Cannot access reflection.", e);
                         }
                     }
-
+                    
                     @Override
                     public void set(Object target, Object value) {
                         try {
@@ -160,7 +161,7 @@ public final class Reflection {
                             throw new RuntimeException("Cannot access reflection.", e);
                         }
                     }
-
+                    
                     @Override
                     public boolean hasField(Object target) {
                         // target instanceof DeclaringClass
@@ -169,13 +170,13 @@ public final class Reflection {
                 };
             }
         }
-
+        
         // Search in parent classes
         if (target.getSuperclass() != null) return getField(target.getSuperclass(), name, fieldType, index);
-
+        
         throw new IllegalArgumentException("Cannot find field with type " + fieldType);
     }
-
+    
     /**
      * Search for the first publicly and privately defined method of the  given name and parameter count.
      *
@@ -188,7 +189,7 @@ public final class Reflection {
     public static MethodInvoker getMethod(String className, String methodName, Class<?>... params) {
         return getTypedMethod(getClass(className), methodName, null, params);
     }
-
+    
     /**
      * Search for the first publicly and privately defined method of the given name and parameter count.
      *
@@ -201,7 +202,7 @@ public final class Reflection {
     public static MethodInvoker getMethod(Class<?> clazz, String methodName, Class<?>... params) {
         return getTypedMethod(clazz, methodName, null, params);
     }
-
+    
     /**
      * Search for the first publicly and privately defined method of the given name and parameter count.
      *
@@ -216,7 +217,7 @@ public final class Reflection {
         for (final Method method : clazz.getDeclaredMethods()) {
             if ((methodName == null || method.getName().equals(methodName)) && (returnType == null || method.getReturnType().equals(returnType)) && Arrays.equals(method.getParameterTypes(), params)) {
                 method.setAccessible(true);
-
+                
                 return (target, arguments) -> {
                     try {
                         return method.invoke(target, arguments);
@@ -226,13 +227,13 @@ public final class Reflection {
                 };
             }
         }
-
+        
         // Search in every superclass
         if (clazz.getSuperclass() != null) return getMethod(clazz.getSuperclass(), methodName, params);
-
+        
         throw new IllegalStateException(String.format("Unable to find method %s (%s).", methodName, Arrays.asList(params)));
     }
-
+    
     /**
      * Search for the first publically and privately defined constructor of the given name and parameter count.
      *
@@ -244,7 +245,7 @@ public final class Reflection {
     public static ConstructorInvoker getConstructor(String className, Class<?>... params) {
         return getConstructor(getClass(className), params);
     }
-
+    
     /**
      * Search for the first publicly and privately defined constructor of the given name and parameter count.
      *
@@ -257,7 +258,7 @@ public final class Reflection {
         for (final Constructor<?> constructor : clazz.getDeclaredConstructors()) {
             if (Arrays.equals(constructor.getParameterTypes(), params)) {
                 constructor.setAccessible(true);
-
+                
                 return arguments -> {
                     try {
                         return constructor.newInstance(arguments);
@@ -267,10 +268,10 @@ public final class Reflection {
                 };
             }
         }
-
+        
         throw new IllegalStateException(String.format("Unable to find constructor for %s (%s).", clazz, Arrays.asList(params)));
     }
-
+    
     /**
      * Retrieve a class from its full name, without knowing its type on compile time.
      * <p>
@@ -285,7 +286,7 @@ public final class Reflection {
         @SuppressWarnings({"rawtypes", "unchecked"}) Class<Object> clazz = (Class) getClass(lookupName);
         return clazz;
     }
-
+    
     /**
      * Retrieve a class from its full name.
      * <p>
@@ -317,7 +318,7 @@ public final class Reflection {
     public static Class<?> getClass(String lookupName) {
         return getCanonicalClass(expandVariables(lookupName));
     }
-
+    
     /**
      * Retrieve a class in the net.minecraft.server.VERSION.* package.
      *
@@ -327,7 +328,7 @@ public final class Reflection {
     public static Class<?> getMinecraftClass(String name) {
         return getCanonicalClass(NMS_PREFIX + "." + name);
     }
-
+    
     /**
      * Retrieve a class in the org.bukkit.craftbukkit.VERSION.* package.
      *
@@ -337,7 +338,7 @@ public final class Reflection {
     public static Class<?> getCraftBukkitClass(String name) {
         return getCanonicalClass(OBC_PREFIX + "." + name);
     }
-
+    
     /**
      * Retrieve a class by its canonical name.
      *
@@ -351,7 +352,7 @@ public final class Reflection {
             throw new IllegalArgumentException("Cannot find " + canonicalName, e);
         }
     }
-
+    
     /**
      * Expand variables such as "{nms}" and "{obc}" to their corresponding packages.
      *
@@ -361,22 +362,23 @@ public final class Reflection {
     private static String expandVariables(String name) {
         StringBuffer output = new StringBuffer();
         Matcher matcher = MATCH_VARIABLE.matcher(name);
-
+        
         while (matcher.find()) {
             String variable = matcher.group(1);
             String replacement;
-
+            
             // Expand all detected variables
             if ("nms".equalsIgnoreCase(variable)) replacement = NMS_PREFIX;
             else if ("obc".equalsIgnoreCase(variable)) replacement = OBC_PREFIX;
             else if ("version".equalsIgnoreCase(variable)) replacement = VERSION;
             else throw new IllegalArgumentException("Unknown variable: " + variable);
-
+            
             // Assume the expanded variables are all packages, and append a dot
-            if (replacement.length() > 0 && matcher.end() < name.length() && name.charAt(matcher.end()) != '.') replacement += ".";
+            if (replacement.length() > 0 && matcher.end() < name.length() && name.charAt(matcher.end()) != '.')
+                replacement += ".";
             matcher.appendReplacement(output, Matcher.quoteReplacement(replacement));
         }
-
+        
         matcher.appendTail(output);
         return output.toString();
     }

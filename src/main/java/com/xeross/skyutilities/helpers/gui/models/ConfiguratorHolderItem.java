@@ -3,8 +3,9 @@ package com.xeross.skyutilities.helpers.gui.models;
 import com.xeross.skyutilities.helpers.gui.api.ConfiguratorHolderMessageAPI;
 import com.xeross.skyutilities.helpers.items.utils.ItemCreator;
 import com.xeross.skyutilities.helpers.messages.api.MessageType;
+import org.bukkit.plugin.Plugin;
 
-public class ConfiguratorHolderItem<O extends Enum<O> & MessageType> {
+public class ConfiguratorHolderItem<P extends Plugin, O extends Enum<O> & MessageType> {
     
     private final O type;
     private final ItemCreator item;

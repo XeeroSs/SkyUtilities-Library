@@ -6,8 +6,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
-import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
@@ -25,9 +25,11 @@ import java.util.stream.Collectors;
  * @author XeroSs
  * @version 1.4.0
  */
-public abstract class BaseCommand implements CommandExecutor {
+@SuppressWarnings("unused")
+public abstract class BaseCommand<P extends Plugin> implements CommandExecutor {
     
-    private final SkyUtilities main;
+    private final SkyUtilities<P> skyUtilities;
+    private final P main;
     private final String command;
     private final String usages;
     private final String usage;
@@ -43,19 +45,19 @@ public abstract class BaseCommand implements CommandExecutor {
                 if (messageOnlyPlayer != null) Bukkit.getConsoleSender().sendMessage(messageOnlyPlayer);
                 return true;
             }
-            getConsoleCommand(commandSender, oCommand, strings, main);
+            getConsoleCommand(main, commandSender, oCommand, strings);
             return true;
         }
         final Player player = ((Player) commandSender);
-        getPlayerCommand(player, oCommand, strings, main);
+        getPlayerCommand(main, player, oCommand, strings);
         return true;
     }
     
-    protected boolean isInAntiSpam(Player player, @Nullable String messageAntiSpam) {
-        final HashMap<Player, Long> antiSpam = main.getAPI().getGlobalAPI().getAntiSpam();
+    protected boolean isInAntiSpam(Player player, String messageAntiSpam) {
+        final HashMap<Player, Long> antiSpam = skyUtilities.getAPI().getGlobalAPI().getAntiSpam();
         final Long register = antiSpam.get(player);
         if (register != null) {
-            if (((register / 1000) + main.getAPI().getGlobalAPI().getCooldownAntiSpam()) > (System.currentTimeMillis() / 1000)) {
+            if (((register / 1000) + skyUtilities.getAPI().getGlobalAPI().getCooldownAntiSpam()) > (System.currentTimeMillis() / 1000)) {
                 player.sendMessage(messageAntiSpam);
                 return true;
             }
@@ -64,11 +66,11 @@ public abstract class BaseCommand implements CommandExecutor {
         return false;
     }
     
-    protected void getPlayerCommand(final Player player, final Command command, final String[] strings, final SkyUtilities main) {
+    protected void getPlayerCommand(final P main, final Player player, final Command command, final String[] strings) {
     
     }
     
-    protected void getConsoleCommand(final CommandSender sender, final Command command, final String[] strings, final SkyUtilities main) {
+    protected void getConsoleCommand(final P main, final CommandSender sender, final Command command, final String[] strings) {
     
     }
     
@@ -76,7 +78,8 @@ public abstract class BaseCommand implements CommandExecutor {
         player.sendMessage(usage);
     }
     
-    public BaseCommand(SkyUtilities main, String command, String usages, @Nullable String messageOnlyPlayer) {
+    public BaseCommand(P main, SkyUtilities<P> skyUtilities, String command, String usages, String messageOnlyPlayer) {
+        this.skyUtilities = skyUtilities;
         this.main = main;
         this.command = command;
         this.usages = usages;
@@ -86,7 +89,8 @@ public abstract class BaseCommand implements CommandExecutor {
         this.usage = usageForm(usages);
     }
     
-    public BaseCommand(SkyUtilities main, String command, @Nullable String messageOnlyPlayer) {
+    public BaseCommand(P main, SkyUtilities<P> skyUtilities, String command, String messageOnlyPlayer) {
+        this.skyUtilities = skyUtilities;
         this.main = main;
         this.command = command;
         this.usages = command;
@@ -97,7 +101,8 @@ public abstract class BaseCommand implements CommandExecutor {
         build();
     }
     
-    public BaseCommand(SkyUtilities main, String command, String usages, @Nullable String messageOnlyPlayer, Boolean isOnlyPlayer, Boolean isMultipleCommands) {
+    public BaseCommand(P main, SkyUtilities<P> skyUtilities, String command, String usages, String messageOnlyPlayer, Boolean isOnlyPlayer, Boolean isMultipleCommands) {
+        this.skyUtilities = skyUtilities;
         this.main = main;
         this.command = command;
         this.usages = usages;
@@ -112,15 +117,15 @@ public abstract class BaseCommand implements CommandExecutor {
     private void build() {
     }
     
-    protected boolean hasPermission(Player player, String permission, @Nullable String messagePlayerHasNotPermission) {
+    protected boolean hasPermission(Player player, String permission, String messagePlayerHasNotPermission) {
         if (player.hasPermission(permission)) return true;
         if (messagePlayerHasNotPermission != null) player.sendMessage(messagePlayerHasNotPermission);
         return false;
     }
     
     protected Player getTargetOnlineByName(Player player, String nameTarget, boolean acceptSenderIsTarget,
-                                           @Nullable String messageTargetIsOffline,
-                                           @Nullable String messageNotAcceptSenderIsTarget
+                                           String messageTargetIsOffline,
+                                           String messageNotAcceptSenderIsTarget
     ) {
         final Player target = Bukkit.getPlayer(nameTarget);
         if (target == null) {
@@ -139,7 +144,7 @@ public abstract class BaseCommand implements CommandExecutor {
         return Arrays.stream(usageList.split(",")).map(c -> " §c• /" + c).collect(Collectors.joining("\n"));
     }
     
-    protected Integer toIntOrNull(final String stringToInt, final Player player, @Nullable String message) {
+    protected Integer toIntOrNull(final String stringToInt, final Player player, String message) {
         int i;
         try {
             i = Integer.parseInt(stringToInt);

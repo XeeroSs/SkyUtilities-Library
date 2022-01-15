@@ -16,9 +16,9 @@ import java.util.Map;
 
 public class LangMessageHandler<T extends Enum<T>, O extends Enum<O> & MessageType> implements MainAPI {
     
-    private final HashMap<Lang<T, O, String>, HashMap<O, String>> message;
+    private final HashMap<T, HashMap<O, String>> message;
     
-    public HashMap<Lang<T, O, String>, HashMap<O, String>> getMessage() {
+    public HashMap<T, HashMap<O, String>> getMessage() {
         return message;
     }
     
@@ -27,12 +27,12 @@ public class LangMessageHandler<T extends Enum<T>, O extends Enum<O> & MessageTy
         onReload();
     }
     
-    public String getMessage(O path, Lang<T, O, String> lang) {
+    public String getMessage(O path, T lang) {
         return message.get(lang).get(path);
     }
     
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    private void register(Lang<T, O, String> lang, File file, String prefixPath) {
+    @SuppressWarnings({"ResultOfMethodCallIgnored", "unused"})
+    public void register(Lang<T, O, String> lang, File file, String prefixPath) {
         boolean fileCreated = false;
         if (!file.exists()) {
             try {
@@ -53,7 +53,7 @@ public class LangMessageHandler<T extends Enum<T>, O extends Enum<O> & MessageTy
                 fileMessages.put(messageTypeStringEntry.getKey(),
                         ChatColor.translateAlternateColorCodes('&', translated));
             }
-            message.put(lang, fileMessages);
+            message.put(lang.getType(), fileMessages);
             try {
                 configuration.save(file);
             } catch (IOException e) {
@@ -77,7 +77,7 @@ public class LangMessageHandler<T extends Enum<T>, O extends Enum<O> & MessageTy
         } catch (IOException e) {
             e.printStackTrace();
         }
-        message.put(lang, fileMessages);
+        message.put(lang.getType(), fileMessages);
     }
     
     @Override

@@ -7,6 +7,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.HashMap;
 import java.util.Map;
 
+@SuppressWarnings("unused")
 public enum ConfiguratorHolderPaintingType {
     
     FULLY((main, slots, items, sorted) -> {

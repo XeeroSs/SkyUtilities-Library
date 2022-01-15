@@ -6,8 +6,9 @@ import com.xeross.skyutilities.helpers.gui.models.types.ConfiguratorHolderSizeTy
 import com.xeross.skyutilities.helpers.gui.models.types.ConfiguratorHolderType;
 import com.xeross.skyutilities.helpers.items.utils.ItemCreator;
 import com.xeross.skyutilities.helpers.messages.api.MessageType;
+import org.bukkit.plugin.Plugin;
 
-public class ConfiguratorHolder<O extends Enum<O> & MessageType> {
+public class ConfiguratorHolder<P extends Plugin, O extends Enum<O> & MessageType> {
     
     private final ConfiguratorHolderSizeType size;
     private final ConfiguratorHolderType type;

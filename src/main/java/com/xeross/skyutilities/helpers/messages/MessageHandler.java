@@ -1,12 +1,10 @@
 package com.xeross.skyutilities.helpers.messages;
 
-import com.sun.istack.internal.Nullable;
-import com.xeross.skyutilities.SkyUtilities;
+
 import com.xeross.skyutilities.helpers.messages.api.Lang;
 import com.xeross.skyutilities.helpers.messages.api.MessageAPI;
 import com.xeross.skyutilities.helpers.messages.api.MessageType;
 import com.xeross.skyutilities.helpers.messages.models.MessagesHolder;
-import lombok.NonNull;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -17,8 +15,6 @@ import java.util.regex.Pattern;
 
 public class MessageHandler implements MessageAPI {
     
-    private final SkyUtilities main;
-    
     @Override
     public void onDisable() {
     }
@@ -27,13 +23,12 @@ public class MessageHandler implements MessageAPI {
     public void onReload() {
     }
     
-    public MessageHandler(SkyUtilities main) {
-        this.main = main;
+    public MessageHandler() {
     }
     
     @Override
     public <T extends Enum<T>, O extends Enum<O> & MessageType> void sendMessage(LangMessageHandler<T, O> langMessageHandler,
-                                                                                 O messages, Player player, Lang<T, O, String> lang, @javax.annotation.Nullable String prefix) {
+                                                                                 O messages, Player player, T lang, @javax.annotation.Nullable String prefix) {
         String message_by_lang = langMessageHandler.getMessage(messages, lang);
         if (prefix != null) {
             player.sendMessage(prefix + message_by_lang);
@@ -44,7 +39,7 @@ public class MessageHandler implements MessageAPI {
     
     @Override
     public <T extends Enum<T>, O extends Enum<O> & MessageType> void sendMessage(LangMessageHandler<T, O> langMessageHandler,
-                                                                                 O messages, Player player, Lang<T, O, String> lang,
+                                                                                 O messages, Player player, T lang,
                                                                                  @javax.annotation.Nullable String prefix, String[] keys, String[] value) {
         String message_by_lang = langMessageHandler.getMessage(messages, lang);
         String message_has_send = prefix != null ? prefix + message_by_lang : message_by_lang;
@@ -56,7 +51,7 @@ public class MessageHandler implements MessageAPI {
     
     @Override
     public <T extends Enum<T>, O extends Enum<O> & MessageType> void sendMessages(LangLinesHandler<T, O> langMessageHandler,
-                                                                                  O messages, @NonNull Lang<T, O, ArrayList<String>> lang, Player player) {
+                                                                                  O messages, T lang, Player player) {
         final ArrayList<String> message_by_lang = langMessageHandler.getMessage(messages, lang);
         message_by_lang.forEach(player::sendMessage);
     }
@@ -64,7 +59,7 @@ public class MessageHandler implements MessageAPI {
     @Override
     public <T extends Enum<T>, O extends Enum<O> & MessageType> String getMessage(LangMessageHandler<T, O> langMessageHandler,
                                                                                   O messages,
-                                                                                  @NonNull Lang<T, O, String> lang, String[] keys, String[] value) {
+                                                                                 T lang, String[] keys, String[] value) {
         String message_by_lang = langMessageHandler.getMessage(messages, lang);
         if (keys.length == value.length) for (int i = 0; i < keys.length; i++) {
             message_by_lang = message_by_lang.replace(keys[i], value[i]);
@@ -74,7 +69,7 @@ public class MessageHandler implements MessageAPI {
     
     @Override
     public <T extends Enum<T>, O extends Enum<O> & MessageType> void sendMessages(LangLinesHandler<T, O> langMessageHandler,
-                                                                                  O messages, Player player, @NonNull Lang<T, O, ArrayList<String>> lang,
+                                                                                  O messages, Player player, T lang,
                                                                                   String[] keys, String[] values) {
         final ArrayList<String> message_by_lang = langMessageHandler.getMessage(messages, lang);
         ArrayList<String> lore = new ArrayList<>(message_by_lang);
@@ -95,19 +90,19 @@ public class MessageHandler implements MessageAPI {
     
     @Override
     public <T extends Enum<T>, O extends Enum<O> & MessageType> String getMessage(LangMessageHandler<T, O> langMessageHandler,
-                                                                                  O messages, @NonNull Lang<T, O, String> lang) {
+                                                                                  O messages, T lang) {
         return langMessageHandler.getMessage(messages, lang);
     }
     
     @Override
     public <T extends Enum<T>, O extends Enum<O> & MessageType> MessagesHolder getLinesWithTitle(LangLinesWithTitleHandler<T, O> langMessageHandler,
-                                                                                                 O messages, @NonNull Lang<T, O, MessagesHolder> lang) {
+                                                                                                 O messages, T lang) {
         return langMessageHandler.getMessage(messages, lang);
     }
     
     @Override
     public <T extends Enum<T>, O extends Enum<O> & MessageType> MessagesHolder getLinesWithTitle(LangLinesWithTitleHandler<T, O> langMessageHandler,
-                                                                                                 O messages, @NonNull Lang<T, O, MessagesHolder> lang,
+                                                                                                 O messages, T lang,
                                                                                                  String[] keys, String[] values) {
         final MessagesHolder message_by_lang = langMessageHandler.getMessage(messages, lang);
         String title = message_by_lang.getTitle();
@@ -129,27 +124,27 @@ public class MessageHandler implements MessageAPI {
     }
     
     @Override
-    public <T extends Enum<T>, O extends Enum<O> & MessageType> HashMap<Lang<T, O, MessagesHolder>, HashMap<O, MessagesHolder>>
+    public <T extends Enum<T>, O extends Enum<O> & MessageType> HashMap<T, HashMap<O, MessagesHolder>>
     getAllMessages(LangLinesWithTitleHandler<T, O> langMessageHandler) {
         return langMessageHandler.getLines();
     }
     
     @Override
-    public <T extends Enum<T>, O extends Enum<O> & MessageType> HashMap<Lang<T, O, ArrayList<String>>, HashMap<O, ArrayList<String>>>
+    public <T extends Enum<T>, O extends Enum<O> & MessageType> HashMap<T, HashMap<O, ArrayList<String>>>
     getAllMessages(LangLinesHandler<T, O> langMessageHandler) {
         return langMessageHandler.getLines();
     }
     
     @Override
-    public <T extends Enum<T>, O extends Enum<O> & MessageType> HashMap<Lang<T, O, String>, HashMap<O, String>>
+    public <T extends Enum<T>, O extends Enum<O> & MessageType> HashMap<T, HashMap<O, String>>
     getAllMessages(LangMessageHandler<T, O> langMessageHandler) {
         return langMessageHandler.getMessage();
     }
     
     @Override
     public <T extends Enum<T>, O extends Enum<O> & MessageType> ArrayList<String> isMessage(LangMessageHandler<T, O> langMessageHandler,
-                                                                                            @NonNull O messageType, @NonNull String message,
-                                                                                            @NonNull Lang<T, O, String> lang, @Nullable String[] keys) {
+                                                                                            O messageType, String message,
+                                                                                        T lang, String[] keys) {
         String messageDefault = getMessage(langMessageHandler, messageType, lang);
         if (keys == null) {
             if (messageDefault.equals(message)) return new ArrayList<>();
@@ -176,9 +171,9 @@ public class MessageHandler implements MessageAPI {
     
     @Override
     public <T extends Enum<T>, O extends Enum<O> & MessageType> ArrayList<String> isMessage(LangLinesWithTitleHandler<T, O> langMessageHandler,
-                                                                                            @NonNull O itemMessageType, @NonNull String title,
-                                                                                            @NonNull List<String> lore, @NonNull Lang<T, O, MessagesHolder> lang,
-                                                                                            @Nullable String[] keys) {
+                                                                                            O itemMessageType, String title,
+                                                                                            List<String> lore, T lang,
+                                                                                            String[] keys) {
         MessagesHolder messageDefault = getLinesWithTitle(langMessageHandler, itemMessageType, lang);
         if (keys == null) {
             if (messageDefault.getTitle().equals(title)) return new ArrayList<>();
