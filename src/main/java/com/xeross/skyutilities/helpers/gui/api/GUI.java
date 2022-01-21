@@ -36,7 +36,7 @@ public abstract class GUI<P extends Plugin> {
      * 36 37 38 39 40 41 42 43 44
      * <p>
      * 45 46 47 48 49 50 51 52 53
-     **/
+     */
     public abstract ItemStack[] getContents(Player player, String addonsForTile, String[] addons);
     
     public abstract void animated(Player player, Inventory inventory, String addonsForTile);

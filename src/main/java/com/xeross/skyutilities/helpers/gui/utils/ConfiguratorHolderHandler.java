@@ -55,8 +55,10 @@ public abstract class ConfiguratorHolderHandler<P extends Plugin, O extends Enum
     private final ArrayList<ConfiguratorHolder<P, O>> fromItems;
     private final HashMap<Integer, ConfiguratorHolder<P, O>> fromItemsWithPosition;
     private final HashMap<Integer, HolderItem<P, O>> itemOnly;
+    private final HashMap<Integer, HolderItemWithLore<P, L>> itemWithLoreOnly;
     private final HashMap<Integer, ItemStack> itemPainting;
     private final ArrayList<HolderItem<P, O>> itemOnlyToPlaceAtCenter;
+    private final ArrayList<HolderItemWithLore<P, L>> itemWithLoreToPlaceAtCenter;
     private final short[] glasses;
     
     private final ChatColor[] colors;
@@ -87,7 +89,9 @@ public abstract class ConfiguratorHolderHandler<P extends Plugin, O extends Enum
         this.sizeInventory = getSize();
         this.cache = new HashMap<>();
         this.itemOnly = new HashMap<>();
+        this.itemWithLoreOnly = new HashMap<>();
         this.indexNotAvailableForPage = new ArrayList<>();
+        this.itemWithLoreToPlaceAtCenter = new ArrayList<>();
         this.isAddons = false;
         this.fromItemsWithPosition = new HashMap<>();
         this.itemPainting = new HashMap<>();
@@ -201,12 +205,16 @@ public abstract class ConfiguratorHolderHandler<P extends Plugin, O extends Enum
         itemOnlyToPlaceAtCenter.add(new HolderItem<>(messageType, item, keys, values, apiItem));
     }
     
-    private ArrayList<Integer> getIndexForPlaceItemAtCenter(final int sizeHeight, final int spaceBetweenItemsAndBorderRightAndLeft) {
+    public void addWithLore(ItemCreator item, L messageType, String[] keys, ConfiguratorHolderMessageAPI[] values, HolderItemAPI<P> apiItem) {
+        itemWithLoreToPlaceAtCenter.add(new HolderItemWithLore<>(messageType, item, keys, values, apiItem));
+    }
+    
+    private <A> ArrayList<Integer> getIndexForPlaceItemAtCenter(final int sizeHeight, final int spaceBetweenItemsAndBorderRightAndLeft, ArrayList<A> items) {
         
         final ArrayList<Integer> indexes = new ArrayList<>();
         
         if (sizeHeight <= 0) return indexes;
-        final int amount = itemOnlyToPlaceAtCenter.size();
+        final int amount = items.size();
         if (amount <= 0) return indexes;
         
         if (spaceBetweenItemsAndBorderRightAndLeft < 0 || spaceBetweenItemsAndBorderRightAndLeft > 4) return indexes;
@@ -232,7 +240,7 @@ public abstract class ConfiguratorHolderHandler<P extends Plugin, O extends Enum
             int c = 4;
             
             if (amount_index >= 8 || amount_index % 2 != 0) {
-                final HolderItem<P, O> item = getFirstOrNull(array_index);
+                final Object item = getFirstOrNull(array_index, items);
                 amount_index--;
                 array_index++;
                 if (item == null) return indexes;
@@ -253,7 +261,7 @@ public abstract class ConfiguratorHolderHandler<P extends Plugin, O extends Enum
                     return indexes;
                 
                 if (c_left <= 0 || c_right >= 8) return indexes;
-                final HolderItem<P, O> item = getFirstOrNull(array_index);
+                final Object item = getFirstOrNull(array_index, items);
                 amount_index--;
                 array_index++;
                 if (item == null) return indexes;
@@ -339,7 +347,7 @@ public abstract class ConfiguratorHolderHandler<P extends Plugin, O extends Enum
             for (int i = spaceBetweenItemsAndBorderRightAndLeft; i < (9 - spaceBetweenItemsAndBorderRightAndLeft); i++) {
                 
                 if (i == spaceBetweenItemsAndBorderRightAndLeft && (amount_index > 8 - (spaceBetweenItemsAndBorderRightAndLeft + spaceBetweenItemsAndBorderRightAndLeft) || amount_index % 2 != 0)) {
-                    final HolderItem<P, O> item = getFirstOrNull(array_index);
+                    final Object item = getFirstOrNull(array_index, items);
                     amount_index--;
                     array_index++;
                     if (item == null) return indexes;
@@ -352,7 +360,7 @@ public abstract class ConfiguratorHolderHandler<P extends Plugin, O extends Enum
                 if (add) c_right += 1;
                 else c_left -= 1;
                 
-                final HolderItem<P, O> item = getFirstOrNull(array_index);
+                final Object item = getFirstOrNull(array_index, items);
                 amount_index--;
                 array_index++;
                 if (item == null) return indexes;
@@ -373,7 +381,7 @@ public abstract class ConfiguratorHolderHandler<P extends Plugin, O extends Enum
     }
     
     private void placeToCenter(final int sizeHeight, final int spaceBetweenItemsAndBorderRightAndLeft) {
-        final ArrayList<Integer> indexes = getIndexForPlaceItemAtCenter(sizeHeight, spaceBetweenItemsAndBorderRightAndLeft);
+        final ArrayList<Integer> indexes = getIndexForPlaceItemAtCenter(sizeHeight, spaceBetweenItemsAndBorderRightAndLeft, itemOnlyToPlaceAtCenter);
         Collections.sort(indexes);
         final int size = itemOnlyToPlaceAtCenter.size();
         for (int i = 0; i < size; i++) {
@@ -388,8 +396,44 @@ public abstract class ConfiguratorHolderHandler<P extends Plugin, O extends Enum
         }
     }
     
-    private HolderItem<P, O> getFirstOrNull(int array_index) {
-        return itemOnlyToPlaceAtCenter.size() <= array_index ? null : itemOnlyToPlaceAtCenter.get(array_index);
+    private void placeWithLoreToCenter(final int sizeHeight, final int spaceBetweenItemsAndBorderRightAndLeft) {
+        final ArrayList<Integer> indexes = getIndexForPlaceItemAtCenter(sizeHeight, spaceBetweenItemsAndBorderRightAndLeft, itemWithLoreToPlaceAtCenter);
+        Collections.sort(indexes);
+        final int size = itemWithLoreToPlaceAtCenter.size();
+        for (int i = 0; i < size; i++) {
+            
+            final HolderItemWithLore<P, L> item = itemWithLoreToPlaceAtCenter.size() <= i ? null : itemWithLoreToPlaceAtCenter.get(i);
+            if (item == null) return;
+            
+            final Integer index = indexes.size() <= i ? null : indexes.get(i);
+            if (index == null) return;
+            
+            itemWithLoreOnly.put(index, item);
+        }
+    }
+    
+    private <A> Object getFirstOrNull(int array_index, ArrayList<A> items) {
+        return items.size() <= array_index ? null : items.get(array_index);
+    }
+    
+    public <T extends Enum<T>> void placeWithLore(final P plugin, final LangLinesWithTitleHandler<T, L> langMessageHandler,
+                                                  final Player player, final ItemStack[] itemSlot, String addons, T lang) {
+        for (Map.Entry<Integer, HolderItemWithLore<P, L>> item : itemWithLoreOnly.entrySet()) {
+            final HolderItemWithLore<P, L> value = item.getValue();
+            if (item.getValue().getType() == null) {
+                itemSlot[item.getKey()] = value.getItem() == null ? null : value.getItem().getItem();
+                continue;
+            }
+            ArrayList<String> lore = new ArrayList<>();
+            MessagesHolder itemMessage = main.getAPI().getMessageAPI().getLinesWithTitle(langMessageHandler, value.getType(), lang, value.getKeys(),
+                    Arrays.stream(value.getValue()).map(configuratorHolderMessageAPI -> configuratorHolderMessageAPI.get(player)).toArray(String[]::new));
+            itemSlot[item.getKey()] = item.getValue().getKeys() == null ? value.getItem().setName(itemMessage.getTitle()).getItem() :
+                    value.getItem().setName(itemMessage.getTitle()).addLore(itemMessage.getLines()).getItem();
+    /*
+            itemSlot[item.getKey()] = item.getValue().getKeys() == null ? value.getItem().setName(main.getAPI().getMessageAPI().getMessage(langMessageHandler, value.getType(),
+                    lang)).getItem() : value.getItem().setName(main.getAPI().getMessageAPI().getMessage(langMessageHandler, value.getType(), lang, value.getKeys(),
+                    Arrays.stream(value.getValue()).map(configuratorHolderMessageAPI -> configuratorHolderMessageAPI.get(player)).toArray(String[]::new))).getItem();*/
+        }
     }
     
     
@@ -569,6 +613,12 @@ public abstract class ConfiguratorHolderHandler<P extends Plugin, O extends Enum
             apiItem.getAPI().perform(plugin, name, player, e.getClickedInventory().getTitle(), e);
             return false;
         }
+        final HolderItemWithLore<P, L> apiItemWithLore = itemWithLoreOnly.get(e.getRawSlot());
+        if (apiItemWithLore != null) {
+            if (apiItemWithLore.getAPI() == null) return false;
+            apiItemWithLore.getAPI().perform(plugin, name, player, e.getClickedInventory().getTitle(), e);
+            return false;
+        }
         final ConfiguratorHolderData api = cache.get(name);
         if (api == null) return true;
         if (api.getApi() == null) return false;
@@ -592,6 +642,7 @@ public abstract class ConfiguratorHolderHandler<P extends Plugin, O extends Enum
         }
         
         placeToCenter(sizeInventory, spaceBetweenItemsAndBorderRightAndLeft);
+        placeWithLoreToCenter(sizeInventory, spaceBetweenItemsAndBorderRightAndLeft);
         fromItemsWithPosition.forEach(this::initialize);
         
         if (isAddons) {
@@ -618,6 +669,7 @@ public abstract class ConfiguratorHolderHandler<P extends Plugin, O extends Enum
         }
         
         placeToCenter(sizeInventory, 0);
+        placeWithLoreToCenter(sizeInventory, 0);
         fromItemsWithPosition.forEach(this::initialize);
         
         if (isAddons) {

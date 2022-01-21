@@ -1,13 +1,13 @@
 package com.xeross.skyutilities.helpers.messages;
 
 
-import com.xeross.skyutilities.helpers.messages.api.Lang;
 import com.xeross.skyutilities.helpers.messages.api.MessageAPI;
 import com.xeross.skyutilities.helpers.messages.api.MessageType;
 import com.xeross.skyutilities.helpers.messages.models.MessagesHolder;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -59,7 +59,7 @@ public class MessageHandler implements MessageAPI {
     @Override
     public <T extends Enum<T>, O extends Enum<O> & MessageType> String getMessage(LangMessageHandler<T, O> langMessageHandler,
                                                                                   O messages,
-                                                                                 T lang, String[] keys, String[] value) {
+                                                                                  T lang, String[] keys, String[] value) {
         String message_by_lang = langMessageHandler.getMessage(messages, lang);
         if (keys.length == value.length) for (int i = 0; i < keys.length; i++) {
             message_by_lang = message_by_lang.replace(keys[i], value[i]);
@@ -144,7 +144,7 @@ public class MessageHandler implements MessageAPI {
     @Override
     public <T extends Enum<T>, O extends Enum<O> & MessageType> ArrayList<String> isMessage(LangMessageHandler<T, O> langMessageHandler,
                                                                                             O messageType, String message,
-                                                                                        T lang, String[] keys) {
+                                                                                            T lang, String[] keys) {
         String messageDefault = getMessage(langMessageHandler, messageType, lang);
         if (keys == null) {
             if (messageDefault.equals(message)) return new ArrayList<>();

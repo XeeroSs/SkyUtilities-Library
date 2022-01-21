@@ -19,7 +19,7 @@ public class MenuListener implements Listener, ListenerAPI {
         this.antiSpam = new HashMap<>();
     }
     
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onClick(InventoryClickEvent e) {
         
         final ItemStack item = e.getCurrentItem();
