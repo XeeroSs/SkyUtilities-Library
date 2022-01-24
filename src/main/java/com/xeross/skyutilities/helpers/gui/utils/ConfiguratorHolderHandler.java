@@ -73,18 +73,18 @@ public abstract class ConfiguratorHolderHandler<P extends Plugin, O extends Enum
     private String titlePrefix;
     private boolean isAddons;
     
-    private final SkyUtilities<P> main;
+    private final SkyUtilities<P> skyUtilities;
     private int itemsStartPosition;
     private int itemsEndPosition;
     private final ArrayList<Integer> indexNotAvailableForPage;
     
     
-    public ConfiguratorHolderHandler(final SkyUtilities<P> main) {
-        super(main);
+    public ConfiguratorHolderHandler(final SkyUtilities<P> skyUtilities) {
+        super(skyUtilities);
         this.indexColor = 0;
         this.itemsStartPosition = 0;
         this.itemsEndPosition = 0;
-        this.main = main;
+        this.skyUtilities = skyUtilities;
         this.glasses = new short[]{(short) ColorType.WHITE.getWoolData(), (short) ColorType.LIGHT_BLUE.getWoolData(), (short) ColorType.BLUE.getWoolData()};
         this.sizeInventory = getSize();
         this.cache = new HashMap<>();
@@ -109,12 +109,12 @@ public abstract class ConfiguratorHolderHandler<P extends Plugin, O extends Enum
         this.itemsStartPosition = itemsStartPosition;
         this.itemsEndPosition = itemsEndPosition;
         
-        ItemStack iLeft = main.getAPI().getItemAPI().getSkullAPI().itemFromBase64(Skull.OAK_LEFT.getBase64());
+        ItemStack iLeft = skyUtilities.getAPI().getItemAPI().getSkullAPI().itemFromBase64(Skull.OAK_LEFT.getBase64());
         if (iLeft == null)
             iLeft = new ItemCreator(Material.STAINED_GLASS_PANE).setDurability(ColorType.SILVER.getWoolData()).getItem();
         this.itemOnly.put(positionLeft, new HolderItem<>(messageLeftType, new ItemCreator(iLeft), keysLeft, valuesLeft, apiLeftItem));
         
-        ItemStack iRight = main.getAPI().getItemAPI().getSkullAPI().itemFromBase64(Skull.OAK_RIGHT.getBase64());
+        ItemStack iRight = skyUtilities.getAPI().getItemAPI().getSkullAPI().itemFromBase64(Skull.OAK_RIGHT.getBase64());
         if (iRight == null)
             iRight = new ItemCreator(Material.STAINED_GLASS_PANE).setDurability(ColorType.SILVER.getWoolData()).getItem();
         this.itemOnly.put(positionRight, new HolderItem<>(messageRightType, new ItemCreator(iRight), keysRight, valuesRight, apiRightItem));
@@ -128,13 +128,13 @@ public abstract class ConfiguratorHolderHandler<P extends Plugin, O extends Enum
         this.itemsStartPosition = itemsStartPosition;
         this.itemsEndPosition = itemsEndPosition;
         
-        ItemStack iLeft = main.getAPI().getItemAPI().getSkullAPI().itemFromBase64(Skull.OAK_LEFT.getBase64());
+        ItemStack iLeft = skyUtilities.getAPI().getItemAPI().getSkullAPI().itemFromBase64(Skull.OAK_LEFT.getBase64());
         if (iLeft == null)
             iLeft = new ItemCreator(Material.STAINED_GLASS_PANE).setDurability(ColorType.SILVER.getWoolData()).getItem();
         int positionLeft = getSlots() - 5;
         this.itemOnly.put(positionLeft, new HolderItem<>(messageLeftType, new ItemCreator(iLeft), keysLeft, valuesLeft, apiLeftItem));
         
-        ItemStack iRight = main.getAPI().getItemAPI().getSkullAPI().itemFromBase64(Skull.OAK_RIGHT.getBase64());
+        ItemStack iRight = skyUtilities.getAPI().getItemAPI().getSkullAPI().itemFromBase64(Skull.OAK_RIGHT.getBase64());
         if (iRight == null)
             iRight = new ItemCreator(Material.STAINED_GLASS_PANE).setDurability(ColorType.SILVER.getWoolData()).getItem();
         int positionRight = getSlots() - 3;
@@ -186,7 +186,7 @@ public abstract class ConfiguratorHolderHandler<P extends Plugin, O extends Enum
     public void addPainting(final ConfiguratorHolderPaintingType painting, final int slots, final ItemCreator[] items, ConfiguratorHolderPaintingMaterialType type) {
         if (sizeInventory < 3 && painting != ConfiguratorHolderPaintingType.FULLY) return;
         itemPainting.clear();
-        itemPainting.putAll(painting.getApi().painting(main, slots, items, type));
+        itemPainting.putAll(painting.getApi().painting(skyUtilities, slots, items, type));
     }
     
     public void add(final ConfiguratorHolderSizeType size, final ConfiguratorHolderType type, final ItemCreator item, final O messageType, final String[] keys, final ConfiguratorHolderMessageAPI[] values, final ConfiguratorHolderAPI api) {
@@ -425,7 +425,7 @@ public abstract class ConfiguratorHolderHandler<P extends Plugin, O extends Enum
                 continue;
             }
             ArrayList<String> lore = new ArrayList<>();
-            MessagesHolder itemMessage = main.getAPI().getMessageAPI().getLinesWithTitle(langMessageHandler, value.getType(), lang, value.getKeys(),
+            MessagesHolder itemMessage = skyUtilities.getAPI().getMessageAPI().getLinesWithTitle(langMessageHandler, value.getType(), lang, value.getKeys(),
                     Arrays.stream(value.getValue()).map(configuratorHolderMessageAPI -> configuratorHolderMessageAPI.get(player)).toArray(String[]::new));
             itemSlot[item.getKey()] = item.getValue().getKeys() == null ? value.getItem().setName(itemMessage.getTitle()).getItem() :
                     value.getItem().setName(itemMessage.getTitle()).addLore(itemMessage.getLines()).getItem();
@@ -448,8 +448,8 @@ public abstract class ConfiguratorHolderHandler<P extends Plugin, O extends Enum
                 itemSlot[items.getKey()] = value.getItem().getItem();
                 continue;
             }
-            itemSlot[items.getKey()] = value.getKeys() == null ? value.getItem().setName(main.getAPI().getMessageAPI().getMessage(langMessageHandler, value.getType(),
-                    lang)).getItem() : value.getItem().setName(main.getAPI().getMessageAPI().getMessage(langMessageHandler, value.getType(), lang, value.getKeys(),
+            itemSlot[items.getKey()] = value.getKeys() == null ? value.getItem().setName(skyUtilities.getAPI().getMessageAPI().getMessage(langMessageHandler, value.getType(),
+                    lang)).getItem() : value.getItem().setName(skyUtilities.getAPI().getMessageAPI().getMessage(langMessageHandler, value.getType(), lang, value.getKeys(),
                     Arrays.stream(value.getValue()).map(configuratorHolderMessageAPI -> configuratorHolderMessageAPI.get(player)).toArray(String[]::new))).getItem();
         }
         for (Map.Entry<Integer, HolderItem<P, O>> item : itemOnly.entrySet()) {
@@ -458,8 +458,8 @@ public abstract class ConfiguratorHolderHandler<P extends Plugin, O extends Enum
                 itemSlot[item.getKey()] = value.getItem() == null ? null : value.getItem().getItem();
                 continue;
             }
-            itemSlot[item.getKey()] = item.getValue().getKeys() == null ? value.getItem().setName(main.getAPI().getMessageAPI().getMessage(langMessageHandler, value.getType(),
-                    lang)).getItem() : value.getItem().setName(main.getAPI().getMessageAPI().getMessage(langMessageHandler, value.getType(), lang, value.getKeys(),
+            itemSlot[item.getKey()] = item.getValue().getKeys() == null ? value.getItem().setName(skyUtilities.getAPI().getMessageAPI().getMessage(langMessageHandler, value.getType(),
+                    lang)).getItem() : value.getItem().setName(skyUtilities.getAPI().getMessageAPI().getMessage(langMessageHandler, value.getType(), lang, value.getKeys(),
                     Arrays.stream(value.getValue()).map(configuratorHolderMessageAPI -> configuratorHolderMessageAPI.get(player)).toArray(String[]::new))).getItem();
         }
     }
@@ -484,8 +484,8 @@ public abstract class ConfiguratorHolderHandler<P extends Plugin, O extends Enum
                     itemSlot[index] = item.getItem().getItem();
                     continue;
                 }
-                itemSlot[index] = item.getKeys() == null ? item.getItem().setName(main.getAPI().getMessageAPI().getMessage(langMessageHandler, item.getType(),
-                        lang)).getItem() : item.getItem().setName(main.getAPI().getMessageAPI().getMessage(langMessageHandler, item.getType(), lang, item.getKeys(),
+                itemSlot[index] = item.getKeys() == null ? item.getItem().setName(skyUtilities.getAPI().getMessageAPI().getMessage(langMessageHandler, item.getType(),
+                        lang)).getItem() : item.getItem().setName(skyUtilities.getAPI().getMessageAPI().getMessage(langMessageHandler, item.getType(), lang, item.getKeys(),
                         Arrays.stream(item.getValue()).map(configuratorHolderMessageAPI -> configuratorHolderMessageAPI.get(player)).toArray(String[]::new))).getItem();
             }
         }
@@ -512,7 +512,7 @@ public abstract class ConfiguratorHolderHandler<P extends Plugin, O extends Enum
                     continue;
                 }
                 ArrayList<String> lore = new ArrayList<>();
-                MessagesHolder itemMessage = main.getAPI().getMessageAPI().getLinesWithTitle(langLinesWithTitleHandler, item.getType(), lang, item.getKeys(),
+                MessagesHolder itemMessage = skyUtilities.getAPI().getMessageAPI().getLinesWithTitle(langLinesWithTitleHandler, item.getType(), lang, item.getKeys(),
                         Arrays.stream(item.getValue()).map(configuratorHolderMessageAPI -> configuratorHolderMessageAPI.get(player)).toArray(String[]::new));
                 itemSlot[index] = item.getKeys() == null ? item.getItem().setName(itemMessage.getTitle()).getItem() :
                         item.getItem().setName(itemMessage.getTitle()).addLore(itemMessage.getLines()).getItem();

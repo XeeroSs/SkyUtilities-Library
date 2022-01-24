@@ -15,11 +15,11 @@ public abstract class GUI<P extends Plugin> {
     
     private final String BACK = "§c§l↩ Retour";
     private final ItemStack itemStack;
-    private final SkyUtilities<P> main;
+    private final SkyUtilities<P> skyUtilities;
     
-    public GUI(SkyUtilities<P> main) {
+    public GUI(SkyUtilities<P> skyUtilities) {
         this.itemStack = new ItemCreator(Material.ARROW).setName(BACK).getItem();
-        this.main = main;
+        this.skyUtilities = skyUtilities;
     }
     
     public abstract String getName(String title);
@@ -60,7 +60,7 @@ public abstract class GUI<P extends Plugin> {
     @SuppressWarnings({"unused"})
     protected boolean onBackClick(String name, Player player, Class<? extends GUI<P>> gui) {
         if (!name.equals(BACK)) return false;
-        main.getAPI().getGUIAPI().open(player, gui, "1", null);
+        skyUtilities.getAPI().getGUIAPI().open(player, gui, "1", null);
         return true;
     }
     
