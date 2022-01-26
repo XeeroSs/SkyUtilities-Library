@@ -209,6 +209,10 @@ public abstract class ConfiguratorHolderHandler<P extends Plugin, O extends Enum
         itemWithLoreToPlaceAtCenter.add(new HolderItemWithLore<>(messageType, item, keys, values, apiItem));
     }
     
+    public void addWithLore(int position, ItemCreator item, L messageType, String[] keys, ConfiguratorHolderMessageAPI[] values, HolderItemAPI<P> apiItem) {
+        itemWithLoreOnly.put(position, new HolderItemWithLore<>(messageType, item, keys, values, apiItem));
+    }
+    
     private <A> ArrayList<Integer> getIndexForPlaceItemAtCenter(final int sizeHeight, final int spaceBetweenItemsAndBorderRightAndLeft, ArrayList<A> items) {
         
         final ArrayList<Integer> indexes = new ArrayList<>();
